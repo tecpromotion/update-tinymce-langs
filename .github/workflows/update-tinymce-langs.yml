@@ -23,7 +23,8 @@ jobs:
       - name: Unzip Language Pack
         run: |
           mkdir -p tmp_langs
-          unzip langs.zip -d tmp_langs
+          unzip langs.zip -d tmp_langs_raw
+          mv tmp_langs_raw/langs/* tmp_langs/
 
       - name: Rename Files to *.es5.js
         run: |
