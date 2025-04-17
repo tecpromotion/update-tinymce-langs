@@ -3,6 +3,9 @@ name: Update TinyMCE Language Packs
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update-langs:
     runs-on: ubuntu-latest
