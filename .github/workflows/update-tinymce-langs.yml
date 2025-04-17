@@ -1,0 +1,61 @@
+name: Update TinyMCE Language Packs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-langs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Download Language Pack ZIP
+        run: |
+          curl -L -o langs.zip https://download.tiny.cloud/tinymce/community/languagepacks/6/langs.zip
+
+      - name: Unzip Language Pack
+        run: |
+          mkdir -p tmp_langs
+          unzip langs.zip -d tmp_langs
+
+      - name: Rename Files to *.es5.js
+        run: |
+          cd tmp_langs
+          for f in *.js; do
+            mv "$f" "${f%.js}.es5.js"
+          done
+
+      - name: Format JS files for readability
+        run: |
+          node scripts/format-lang-file.js tmp_langs
+
+      - name: Test formatted language files
+        run: |
+          node scripts/test-lang-files.js tmp_langs
+
+      - name: Syncing to target directory
+        run: |
+          TARGET_DIR="build/media_source/vendor/tinymce/langs/"
+          mkdir -p ${TARGET_DIR}
+          rsync -i -rptgo --checksum --ignore-times --delete tmp_langs/ ${TARGET_DIR}
+
+      - name: Commit and Push if Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n $(git status --porcelain) ]]; then
+            git add build/media_source/vendor/tinymce/langs/
+            git commit -m "Update TinyMCE language packs"
+            git push
+          else
+            echo "✅ No changes – nothing to commit."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
