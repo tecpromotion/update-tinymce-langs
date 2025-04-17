@@ -23,15 +23,15 @@ fs.readdirSync(dir).forEach((filename) => {
     try {
         JSON.parse(match[2]);
     } catch (e) {
-        console.error(`❌ Incorrect JSON structure in: ${filename}`);
+        console.error(`❌ Invalid JSON in file: ${filename}`);
         console.error(e.message);
-        errorFiles.push(`- ${filename}: Incorrect JSON structure: ${e.message}`);
+        errorFiles.push(`- ${filename}: Invalid JSON: ${e.message}`);
         failed = true;
     }
 });
 
 if (failed) {
-    fs.writeFileSync('language-file-errors.md', `## Incorrect language files\n\n${errorFiles.join('\n')}\n`, 'utf8');
+    fs.writeFileSync('language-file-errors.md', `## Invalid language files\n\n${errorFiles.join('\n')}\n`, 'utf8');
     console.error('\n🛑 Test failed. For details, see language-file-errors.md.');
     process.exit(1);
 } else {
