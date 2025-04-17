@@ -41,6 +41,14 @@ jobs:
         run: |
           node scripts/test-lang-files.js tmp_langs
 
+      - name: Upload language file errors (if any)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-file-errors
+          path: language-file-errors.md
+          if-no-files-found: ignore
+
       - name: Syncing to target directory
         run: |
           TARGET_DIR="build/media_source/vendor/tinymce/langs/"
